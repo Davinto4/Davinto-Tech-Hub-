@@ -4,68 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Global Chat | Davinto Tech Hub</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
-    #chat-box {
-      height: 60vh;
-      overflow-y: scroll;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #f9f9f9;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e272e;
+      color: white;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
     }
 
-    .message {
-      margin-bottom: 10px;
-      padding: 8px;
-      background: #dfe6e9;
-      border-radius: 6px;
+    body.dark {
+      background: #ffffff;
+      color: #111;
     }
 
-    .username {
-      font-weight: bold;
-      color: #0984e3;
+    .toggle-mode {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #aaa;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: white;
     }
 
-    .own {
-      background: #b2f7ef;
-      text-align: right;
+    body.dark .toggle-mode {
+      background: rgba(0, 0, 0, 0.1);
+      color: black;
+      border-color: #333;
     }
 
-    #chat-input {
-      width: 70%;
-      padding: 10px;
+    .chat-box {
+      max-width: 800px;
+      margin: 70px auto 30px;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 10px;
+      height: 400px;
+      overflow-y: auto;
     }
 
-    #send-btn {
-      padding: 10px 15px;
+    .msg {
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+
+    .msg strong {
+      color: #00cec9;
+    }
+
+    .input-area {
+      max-width: 800px;
+      margin: auto;
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 18px;
       background: #00b894;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #019875;
+    }
+
+    audio {
+      display: block;
+      margin: 40px auto 0;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #00cec9;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Davinto Tech Hub 🌐</h1>
-    <p>Global Chat Room</p>
-  </header>
 
-  <main class="centered">
-    <div id="chat-box"></div>
+  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
 
-    <input type="text" id="chat-input" placeholder="Type a message..." />
-    <button id="send-btn">Send</button>
+  <div class="chat-box" id="chat-box">
+    <p>Loading chat...</p>
+  </div>
 
-    <br><br>
-    <button onclick="logout()" class="btn">Logout</button>
-  </main>
+  <div class="input-area">
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
-  <!-- Firebase SDK -->
+  <a href="homepage.html">← Back to Homepage</a>
+
+  <audio autoplay loop controls>
+    <source src="music/track.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Firebase Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
@@ -82,60 +141,52 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    let currentUID = null;
-    let currentUsername = "";
-
-    const chatBox = document.getElementById("chat-box");
-    const input = document.getElementById("chat-input");
-    const sendBtn = document.getElementById("send-btn");
-
-    function logout() {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
-    }
-
-    function displayMessage(username, message, isMine) {
-      const div = document.createElement("div");
-      div.className = "message" + (isMine ? " own" : "");
-      div.innerHTML = `<span class="username">${username}</span><br>${message}`;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    let username = "Guest";
 
     onAuthStateChanged(auth, async user => {
-      if (user) {
-        currentUID = user.uid;
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
 
-        // Get user's username
-        const snap = await get(ref(db, `users/${currentUID}`));
-        currentUsername = snap.val()?.username || "Unknown";
-
-        // Load and listen for messages
-        const chatRef = ref(db, "messages");
-        onChildAdded(chatRef, snapshot => {
-          const data = snapshot.val();
-          displayMessage(data.username, data.text, data.uid === currentUID);
-        });
-
-        // Handle sending message
-        sendBtn.onclick = () => {
-          const text = input.value.trim();
-          if (text) {
-            push(ref(db, "messages"), {
-              uid: currentUID,
-              username: currentUsername,
-              text,
-              time: Date.now()
-            });
-            input.value = "";
-          }
-        };
-      } else {
-        // Not logged in
-        window.location.href = "index.html";
+      const uid = user.uid;
+      const snap = await get(ref(db, `users/${uid}`));
+      if (snap.exists()) {
+        username = snap.val().username || "Unknown";
       }
     });
+
+    const chatBox = document.getElementById("chat-box");
+
+    onChildAdded(ref(db, "globalChat"), data => {
+      const chat = data.val();
+      const p = document.createElement("p");
+      p.className = "msg";
+      p.innerHTML = `<strong>${chat.username}:</strong> ${chat.text}`;
+      chatBox.appendChild(p);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    window.sendMessage = function () {
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      push(ref(db, "globalChat"), {
+        username,
+        text,
+        timestamp: Date.now()
+      });
+
+      input.value = "";
+    };
+
+    window.toggleMode = function () {
+      document.body.classList.toggle("dark");
+      document.querySelector(".toggle-mode").textContent =
+        document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+    };
   </script>
+
 </body>
 </html>
