@@ -1,20 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Signup - Davinto Tech Hub</title>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up | Davinto Tech Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background: #fff;
+      color: #222;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      margin-top: 20px;
+      border: none;
+      background: #00b894;
+      color: white;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #019875;
+    }
+
+    .toggle-mode {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #aaa;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: white;
+    }
+
+    body.dark .toggle-mode {
+      background: rgba(0, 0, 0, 0.1);
+      color: black;
+      border-color: #333;
+    }
+
+    audio {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    #msg {
+      color: red;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Sign Up</h2>
-  <input type="text" id="username" placeholder="Username" /><br />
-  <input type="email" id="email" placeholder="Email" /><br />
-  <input type="password" id="password" placeholder="Password" /><br />
-  <button onclick="signup()">Sign Up</button>
-  <p id="msg"></p>
 
-  <script>
+  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
+
+  <div class="container">
+    <h1>Create Account</h1>
+    <p>Join the Davinto Tech Hub and start your tech journey!</p>
+
+    <input type="text" id="username" placeholder="Unique Username" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button class="btn" onclick="handleSignup()">Sign Up</button>
+
+    <p id="msg"></p>
+    <p><a href="index.html" style="color:#00cec9;">← Back to welcome</a></p>
+
+    <audio autoplay loop controls>
+      <source src="music/track.mp3" type="audio/mpeg" />
+    </audio>
+  </div>
+
+  <!-- Firebase logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
       authDomain: "davinto-tech-hub.firebaseapp.com",
@@ -25,40 +127,52 @@
       databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-    async function signup() {
+    window.toggleMode = function () {
+      document.body.classList.toggle('dark');
+      const toggle = document.querySelector('.toggle-mode');
+      toggle.textContent = document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+    };
+
+    window.handleSignup = async function () {
       const username = document.getElementById("username").value.trim().toLowerCase();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const msg = document.getElementById("msg");
 
-      if (!username || !email || !password) {
-        msg.innerText = "Fill all fields.";
+      if (!email || !password || !username) {
+        msg.textContent = "All fields are required.";
         return;
       }
 
       try {
-        const userRef = db.ref("usernames/" + username);
-        const exists = await userRef.get();
-        if (exists.exists()) {
-          msg.innerText = "Username taken!";
+        const usernameSnap = await get(child(ref(db), `usernames/${username}`));
+        if (usernameSnap.exists()) {
+          msg.textContent = "Username already taken.";
           return;
         }
 
-        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCred.user.uid;
-        await db.ref("users/" + uid).set({ username, email });
-        await userRef.set(uid);
 
-        alert("Welcome " + username + "!");
+        await set(ref(db, `users/${uid}`), {
+          email,
+          username
+        });
+
+        await set(ref(db, `usernames/${username}`), uid);
+
+        alert(`Welcome, ${username}!`);
         window.location.href = "homepage.html";
+
       } catch (error) {
-        msg.innerText = error.message;
+        msg.textContent = error.message;
       }
-    }
+    };
   </script>
+
 </body>
 </html>
