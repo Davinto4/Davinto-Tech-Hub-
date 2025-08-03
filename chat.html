@@ -3,23 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Global Chat - Davinto Tech Hub</title>
+  <title>Global Chat | Davinto Tech Hub</title>
   <link rel="stylesheet" href="style.css" />
-  <script type="module" src="chat.js"></script>
+  <style>
+    #chat-box {
+      height: 60vh;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 8px;
+      background: #dfe6e9;
+      border-radius: 6px;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #0984e3;
+    }
+
+    .own {
+      background: #b2f7ef;
+      text-align: right;
+    }
+
+    #chat-input {
+      width: 70%;
+      padding: 10px;
+    }
+
+    #send-btn {
+      padding: 10px 15px;
+      background: #00b894;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-  <nav>
-    <img src="logo.png" class="logo" alt="Davinto Logo" />
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="chat.html">Chat</a>
-    <a href="profile.html">Profile</a>
-  </nav>
-  <div class="container">
-    <h2>Global Chat</h2>
-    <div id="chatBox" class="chat-box"></div>
-    <input id="msgInput" placeholder="Type your message..." type="text" />
-    <button id="sendBtn">Send</button>
-  </div>
+  <header>
+    <h1>Davinto Tech Hub 🌐</h1>
+    <p>Global Chat Room</p>
+  </header>
+
+  <main class="centered">
+    <div id="chat-box"></div>
+
+    <input type="text" id="chat-input" placeholder="Type a message..." />
+    <button id="send-btn">Send</button>
+
+    <br><br>
+    <button onclick="logout()" class="btn">Logout</button>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
+      authDomain: "davinto-tech-hub.firebaseapp.com",
+      projectId: "davinto-tech-hub",
+      storageBucket: "davinto-tech-hub.appspot.com",
+      messagingSenderId: "682350610303",
+      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
+      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUID = null;
+    let currentUsername = "";
+
+    const chatBox = document.getElementById("chat-box");
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+
+    function logout() {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    }
+
+    function displayMessage(username, message, isMine) {
+      const div = document.createElement("div");
+      div.className = "message" + (isMine ? " own" : "");
+      div.innerHTML = `<span class="username">${username}</span><br>${message}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        currentUID = user.uid;
+
+        // Get user's username
+        const snap = await get(ref(db, `users/${currentUID}`));
+        currentUsername = snap.val()?.username || "Unknown";
+
+        // Load and listen for messages
+        const chatRef = ref(db, "messages");
+        onChildAdded(chatRef, snapshot => {
+          const data = snapshot.val();
+          displayMessage(data.username, data.text, data.uid === currentUID);
+        });
+
+        // Handle sending message
+        sendBtn.onclick = () => {
+          const text = input.value.trim();
+          if (text) {
+            push(ref(db, "messages"), {
+              uid: currentUID,
+              username: currentUsername,
+              text,
+              time: Date.now()
+            });
+            input.value = "";
+          }
+        };
+      } else {
+        // Not logged in
+        window.location.href = "index.html";
+      }
+    });
+  </script>
 </body>
 </html>
