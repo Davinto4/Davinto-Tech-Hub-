@@ -3,169 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | Davinto Tech Hub</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Welcome | Davinto Tech Hub</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #f1f2f6;
-      text-align: center;
-      padding: 40px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     .container {
-      max-width: 400px;
-      margin: auto;
+      text-align: center;
       background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    input {
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 400px;
       width: 90%;
-      padding: 10px;
-      margin: 10px auto;
-      display: block;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #00b894;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #2d3436;
+    }
+
+    p {
+      color: #636e72;
+      margin-bottom: 30px;
     }
 
     .btn {
-      background: #00b894;
-      color: white;
-      padding: 10px 20px;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px auto;
+      font-size: 16px;
       border: none;
-      margin-top: 10px;
-      border-radius: 4px;
+      border-radius: 5px;
+      color: white;
       cursor: pointer;
     }
 
+    .login-btn {
+      background-color: #0984e3;
+    }
+
+    .signup-btn {
+      background-color: #00b894;
+    }
+
     .btn:hover {
-      background: #019875;
-    }
-
-    #msg {
-      margin-top: 10px;
-      color: red;
-    }
-
-    a {
-      text-decoration: none;
-      color: #0984e3;
-    }
-
-    .link {
-      margin-top: 20px;
-    }
-
-    #username {
-      display: none;
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2 id="form-title">Login</h2>
+    <!-- ✅ Replace with your actual logo file -->
+    <img src="logo.png" alt="Davinto Logo" class="logo" />
 
-    <input type="text" id="username" placeholder="Username (only for signup)">
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <h1>Welcome to Davinto Tech Hub</h1>
+    <p>Showcasing tech skills, empowering enthusiasts, and teaching future innovators.</p>
 
-    <button onclick="handleAuth()" class="btn" id="auth-btn">Login</button>
-
-    <p id="toggle-text">
-      Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>
-    </p>
-
-    <p id="msg"></p>
-
-    <div class="link">
-      <a href="homepage.html">← Back to Homepage</a>
-    </div>
+    <button class="btn login-btn" onclick="location.href='login.html'">Login</button>
+    <button class="btn signup-btn" onclick="location.href='signup.html'">Sign Up</button>
   </div>
-
-  <!-- Firebase Auth Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
-      authDomain: "davinto-tech-hub.firebaseapp.com",
-      projectId: "davinto-tech-hub",
-      storageBucket: "davinto-tech-hub.appspot.com",
-      messagingSenderId: "682350610303",
-      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
-      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    let isLogin = true;
-
-    window.toggleMode = function () {
-      isLogin = !isLogin;
-      document.getElementById("form-title").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("auth-btn").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("toggle-text").innerHTML =
-        isLogin
-          ? `Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>`
-          : `Already have an account? <a href="#" onclick="toggleMode()">Login</a>`;
-      document.getElementById("username").style.display = isLogin ? "none" : "block";
-      document.getElementById("msg").textContent = "";
-    };
-
-    window.handleAuth = async function () {
-      const username = document.getElementById("username").value.trim().toLowerCase();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const msg = document.getElementById("msg");
-
-      if (!email || !password || (!isLogin && !username)) {
-        msg.textContent = "Please fill all fields.";
-        return;
-      }
-
-      try {
-        if (isLogin) {
-          await signInWithEmailAndPassword(auth, email, password);
-          msg.textContent = "Login successful!";
-          setTimeout(() => window.location.href = "chat.html", 1000);
-        } else {
-          const usernameSnap = await get(child(ref(db), `usernames/${username}`));
-          if (usernameSnap.exists()) {
-            msg.textContent = "Username already taken.";
-            return;
-          }
-
-          const userCred = await createUserWithEmailAndPassword(auth, email, password);
-          const uid = userCred.user.uid;
-
-          await set(ref(db, `users/${uid}`), {
-            email,
-            username
-          });
-
-          await set(ref(db, `usernames/${username}`), uid);
-
-          msg.style.color = "green";
-          msg.textContent = "Signup successful!";
-          setTimeout(() => window.location.href = "chat.html", 1000);
-        }
-      } catch (error) {
-        msg.textContent = error.message;
-      }
-    };
-  </script>
 
 </body>
 </html>
