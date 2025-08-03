@@ -14,17 +14,82 @@
   </header>
 
   <main class="centered">
-    <h2>Welcome!</h2>
-    <p>Join our community of tech enthusiasts.</p>
+    <div id="auth-box">
+      <h2 id="form-title">Login</h2>
 
-    <div class="auth-buttons">
-      <a href="signup.html" class="btn">Sign Up</a>
-      <a href="login.html" class="btn">Log In</a>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+
+      <button onclick="handleAuth()" class="btn" id="auth-btn">Login</button>
+      <p id="toggle-text">Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a></p>
+      <p id="msg"></p>
     </div>
   </main>
 
   <footer>
     <p>&copy; 2025 Davinto Tech Hub. Powered by Firebase.</p>
   </footer>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
+      authDomain: "davinto-tech-hub.firebaseapp.com",
+      projectId: "davinto-tech-hub",
+      storageBucket: "davinto-tech-hub.appspot.com",
+      messagingSenderId: "682350610303",
+      appId: "1:682350610303:web:ce91a8e11033312f57fc4a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let isLogin = true;
+
+    window.toggleMode = function () {
+      isLogin = !isLogin;
+      document.getElementById("form-title").textContent = isLogin ? "Login" : "Sign Up";
+      document.getElementById("auth-btn").textContent = isLogin ? "Login" : "Sign Up";
+      document.getElementById("toggle-text").innerHTML =
+        isLogin
+          ? `Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>`
+          : `Already have an account? <a href="#" onclick="toggleMode()">Login</a>`;
+      document.getElementById("msg").textContent = "";
+    };
+
+    window.handleAuth = function () {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
+
+      if (!email || !password) {
+        msg.textContent = "Fill in all fields!";
+        return;
+      }
+
+      if (isLogin) {
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            msg.textContent = "Login successful! Redirecting...";
+            setTimeout(() => window.location.href = "chat.html", 1000);
+          })
+          .catch(error => {
+            msg.textContent = error.message;
+          });
+      } else {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            msg.textContent = "Sign up successful! Redirecting...";
+            setTimeout(() => window.location.href = "chat.html", 1000);
+          })
+          .catch(error => {
+            msg.textContent = error.message;
+          });
+      }
+    };
+  </script>
 </body>
 </html>
