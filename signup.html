@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up | Davinto Tech Hub</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body, html {
       height: 100%;
@@ -61,7 +57,7 @@
     }
 
     p {
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       font-size: 15px;
     }
 
@@ -85,8 +81,8 @@
       opacity: 0.9;
     }
 
-    .msg {
-      margin-top: 10px;
+    #msg {
+      margin-top: 12px;
       color: red;
     }
 
@@ -150,7 +146,7 @@
 
     <button id="signupBtn">Sign Up</button>
 
-    <p class="msg" id="msg"></p>
+    <p id="msg"></p>
 
     <div class="link">
       Already have an account? <a href="login.html">Login here</a><br>
@@ -161,7 +157,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
@@ -184,14 +180,15 @@
       const msg = document.getElementById("msg");
 
       if (!username || !email || !password) {
+        msg.style.color = "red";
         msg.textContent = "Please fill in all fields.";
         return;
       }
 
       try {
-        const usernameRef = ref(db, `usernames/${username}`);
-        const snapshot = await get(usernameRef);
-        if (snapshot.exists()) {
+        const usernameSnap = await get(child(ref(db), `usernames/${username}`));
+        if (usernameSnap.exists()) {
+          msg.style.color = "red";
           msg.textContent = "Username is already taken!";
           return;
         }
@@ -203,18 +200,18 @@
           email,
           username
         });
-        await set(usernameRef, uid);
+
+        await set(ref(db, `usernames/${username}`), uid);
 
         msg.style.color = "green";
-        msg.textContent = "Signup successful!";
-        setTimeout(() => window.location.href = "homepage.html", 1000);
+        msg.textContent = "Signup successful! Redirecting...";
+        setTimeout(() => window.location.href = "homepage.html", 1500);
       } catch (error) {
         msg.style.color = "red";
         msg.textContent = error.message;
       }
     });
 
-    // 🌗 Theme toggle
     function toggleTheme() {
       const body = document.body;
       body.classList.toggle('dark');
