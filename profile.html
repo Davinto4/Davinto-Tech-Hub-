@@ -3,31 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profile | Davinto Tech Hub</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Edit Profile | Davinto Tech Hub</title>
   <style>
-    .profile-container {
-      max-width: 400px;
-      margin: 40px auto;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
       text-align: center;
-      background: #f0f0f0;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      padding: 60px 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background: #fff;
+      color: #222;
+    }
+
+    .toggle-mode {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #aaa;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: white;
+    }
+
+    body.dark .toggle-mode {
+      background: rgba(0, 0, 0, 0.1);
+      color: black;
+      border-color: #333;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      margin-top: 60px;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 20px;
     }
 
     input {
-      padding: 10px;
-      width: 80%;
-      margin: 10px auto;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
     }
 
     .btn {
+      padding: 12px 25px;
+      margin-top: 15px;
+      border: none;
       background: #00b894;
       color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
     }
 
     .btn:hover {
@@ -35,34 +80,47 @@
     }
 
     #msg {
-      margin-top: 10px;
       color: red;
+      margin-top: 10px;
+    }
+
+    audio {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    a {
+      color: #00cec9;
+      display: block;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Davinto Tech Hub</h1>
-    <p>Edit Your Profile</p>
-  </header>
 
-  <div class="profile-container">
-    <h2>Your Profile</h2>
-    <input type="text" id="new-username" placeholder="Enter new username" />
+  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
+
+  <div class="container">
+    <h1>Edit Profile</h1>
+    <p>Update your username</p>
+
+    <input type="text" id="username" placeholder="New username" />
     <button class="btn" onclick="updateUsername()">Update Username</button>
     <p id="msg"></p>
 
-    <br><br>
-    <button class="btn" onclick="logout()">Logout</button>
-    <br><br>
-    <a href="chat.html">← Back to Chat</a>
+    <a href="homepage.html">← Back to Homepage</a>
+
+    <audio autoplay loop controls>
+      <source src="music/track.mp3" type="audio/mpeg" />
+    </audio>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
@@ -78,61 +136,49 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    let currentUID = "";
-    let currentUsername = "";
+    let currentUID = null;
 
-    onAuthStateChanged(auth, async user => {
-      if (user) {
-        currentUID = user.uid;
-
-        const userSnap = await get(ref(db, `users/${currentUID}`));
-        if (userSnap.exists()) {
-          currentUsername = userSnap.val().username;
-          document.getElementById("new-username").value = currentUsername;
-        }
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
       } else {
-        window.location.href = "index.html";
+        currentUID = user.uid;
+        const snap = await get(ref(db, `users/${currentUID}`));
+        if (snap.exists()) {
+          document.getElementById("username").value = snap.val().username || "";
+        }
       }
     });
 
+    window.toggleMode = function () {
+      document.body.classList.toggle('dark');
+      document.querySelector('.toggle-mode').textContent =
+        document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+    };
+
     window.updateUsername = async function () {
-      const newUsername = document.getElementById("new-username").value.trim().toLowerCase();
+      const username = document.getElementById("username").value.trim().toLowerCase();
       const msg = document.getElementById("msg");
 
-      if (!newUsername) {
-        msg.textContent = "Username cannot be empty!";
+      if (!username || !currentUID) {
+        msg.textContent = "Username required.";
         return;
       }
 
-      if (newUsername === currentUsername) {
-        msg.textContent = "That's already your current username.";
+      const existingSnap = await get(child(ref(db), `usernames/${username}`));
+      if (existingSnap.exists()) {
+        msg.textContent = "Username already taken.";
         return;
       }
 
-      // Check if username is taken
-      const existing = await get(ref(db, `usernames/${newUsername}`));
-      if (existing.exists()) {
-        msg.textContent = "That username is already taken!";
-        return;
-      }
-
-      // Remove old username mapping
-      await remove(ref(db, `usernames/${currentUsername}`));
-
-      // Save new username
-      await set(ref(db, `usernames/${newUsername}`), currentUID);
-      await set(ref(db, `users/${currentUID}/username`), newUsername);
+      await set(ref(db, `users/${currentUID}/username`), username);
+      await set(ref(db, `usernames/${username}`), currentUID);
 
       msg.style.color = "green";
-      msg.textContent = "Username updated successfully!";
-      currentUsername = newUsername;
-    };
-
-    window.logout = function () {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      });
+      msg.textContent = "Username updated!";
+      alert("Username successfully updated!");
     };
   </script>
+
 </body>
 </html>
