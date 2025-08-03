@@ -6,98 +6,224 @@
   <title>Davinto Tech Hub - Home</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
       margin: 0;
-      background: #f7f9fa;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
       color: #2d3436;
     }
 
-    header {
-      background: #0984e3;
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0c2461;
       color: white;
-      padding: 30px 15px;
+      padding: 15px 30px;
+    }
+
+    nav .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    nav .logo img {
+      width: 40px;
+      margin-right: 10px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+
+    header.hero {
+      background: url('hero.jpg') no-repeat center center/cover;
+      color: white;
+      height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    header.hero h1 {
+      font-size: 3em;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    header.hero p {
+      font-size: 1.2em;
+      margin-top: 10px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .section {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0c2461;
+    }
+
+    .team, .blog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
       text-align: center;
     }
 
-    header img {
+    .team-member, .blog-post {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      animation: fadeInUp 1s ease;
+    }
+
+    .team-member img {
       width: 80px;
       height: 80px;
       border-radius: 50%;
       margin-bottom: 10px;
     }
 
-    main {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 0 20px;
-      text-align: center;
+    .blog-post h4 {
+      margin: 10px 0 5px;
+    }
+
+    .blog-post p {
+      font-size: 0.9em;
     }
 
     .cta {
-      background: #00b894;
-      color: white;
-      padding: 15px 25px;
-      font-size: 1.1em;
-      border: none;
-      border-radius: 6px;
-      margin: 20px auto;
-      display: inline-block;
-      text-decoration: none;
+      text-align: center;
+      margin: 40px 0;
     }
 
-    section {
-      margin: 40px 0;
-      text-align: left;
+    .cta a {
+      background: #00b894;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
     }
 
     footer {
+      background: #dfe6e9;
       text-align: center;
       padding: 20px;
-      background: #dfe6e9;
       font-size: 0.9em;
+      margin-top: 60px;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(40px);}
+      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <img src="logo.png" alt="Davinto Logo" />
-    <h1>Davinto Tech Hub</h1>
-    <p>Where tech minds meet, learn, and grow.</p>
+  <!-- Navigation Bar -->
+  <nav>
+    <div class="logo">
+      <img src="logo.png" alt="Logo">
+      <span>Davinto Tech Hub</span>
+    </div>
+    <div>
+      <a href="index.html">Login</a>
+      <a href="profile.html">Profile</a>
+      <a href="chat.html">Chat</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <h1>Welcome to Davinto Tech Hub</h1>
+    <p>Where minds connect, build, and grow in tech 🌍</p>
   </header>
 
-  <main>
-    <a class="cta" href="index.html">Login / Sign Up</a>
+  <!-- About Section -->
+  <div class="section" id="about">
+    <h2>About Us</h2>
+    <p>
+      Davinto Tech Hub is your online base to connect with other tech minds,
+      share your ideas, and grow together. Whether you're a beginner or a pro,
+      you'll find a community here that supports, inspires, and builds.
+    </p>
+  </div>
 
-    <section>
-      <h2>🔥 What Is Davinto Tech Hub?</h2>
-      <p>
-        Davinto Tech Hub is a digital home for developers, creatives, and tech enthusiasts across the globe. Whether you're into web development, AI, mobile apps, or just starting your tech journey — this is where we grow together.
-      </p>
-    </section>
+  <!-- Meet the Team Section -->
+  <div class="section" id="team">
+    <h2>Meet the Team</h2>
+    <div class="team">
+      <div class="team-member">
+        <img src="avatar1.png" alt="Davinto">
+        <h4>Davinto</h4>
+        <p>Founder / Fullstack Dev</p>
+      </div>
+      <div class="team-member">
+        <img src="avatar2.png" alt="Team Member">
+        <h4>Grace</h4>
+        <p>Product Designer</p>
+      </div>
+      <div class="team-member">
+        <img src="avatar3.png" alt="Team Member">
+        <h4>Mike</h4>
+        <p>Community Manager</p>
+      </div>
+    </div>
+  </div>
 
-    <section>
-      <h2>🚀 What You Can Do Here</h2>
-      <ul>
-        <li>🌍 Chat with fellow techies in real-time</li>
-        <li>📚 Learn new skills and tools</li>
-        <li>💼 Showcase your projects</li>
-        <li>🧠 Ask questions, get help, and give back</li>
-      </ul>
-    </section>
+  <!-- Blog / News Section -->
+  <div class="section" id="blog">
+    <h2>Latest Updates</h2>
+    <div class="blog">
+      <div class="blog-post">
+        <h4>🚀 We launched!</h4>
+        <p>Davinto Tech Hub is now live. Start chatting and learning!</p>
+      </div>
+      <div class="blog-post">
+        <h4>📚 Free JS Bootcamp</h4>
+        <p>Join our JavaScript bootcamp this month — totally free.</p>
+      </div>
+      <div class="blog-post">
+        <h4>🛠️ Build with us</h4>
+        <p>We're looking for contributors. Want to join the team?</p>
+      </div>
+    </div>
+  </div>
 
-    <section>
-      <h2>👨‍💻 Powered by Davinto</h2>
-      <p>
-        Built by <strong>Davinto</strong> to connect minds and build a thriving, supportive tech community.
-        Whether you're a beginner or a pro, you belong here.
-      </p>
-    </section>
-  </main>
+  <!-- Call to Action -->
+  <div class="cta">
+    <a href="index.html">Join the Community</a>
+  </div>
 
+  <!-- Footer -->
   <footer>
-    &copy; 2025 Davinto Tech Hub. All rights reserved.
+    &copy; 2025 Davinto Tech Hub. Powered by Firebase & Love ❤️<br>
+    Contact: <a href="mailto:DavintoTech@gmail.com">DavintoTech@gmail.com</a> | WhatsApp: <a href="https://wa.me/2348169045105">+2348169045105</a>
   </footer>
 
 </body>
