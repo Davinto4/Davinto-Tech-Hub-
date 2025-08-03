@@ -70,3 +70,35 @@ button {
   border-radius: 5px;
   font-weight: bold;
 }
+
+.centered {
+  text-align: center;
+  margin-top: 40px;
+}
+
+input {
+  padding: 10px;
+  margin: 10px;
+  width: 80%;
+  max-width: 300px;
+}
+
+.btn {
+  padding: 10px 25px;
+  background: #0984e3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn:hover {
+  background: #74b9ff;
+}
+
+#msg {
+  margin-top: 10px;
+  color: red;
+  font-weight: bold;
+}
