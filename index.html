@@ -3,35 +3,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Davinto Tech Hub</title>
+  <title>Login | Davinto Tech Hub</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f2f6;
+      text-align: center;
+      padding: 40px 15px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .btn {
+      background: #00b894;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin-top: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #019875;
+    }
+
+    #msg {
+      margin-top: 10px;
+      color: red;
+    }
+
+    a {
+      text-decoration: none;
+      color: #0984e3;
+    }
+
+    .link {
+      margin-top: 20px;
+    }
+
+    #username {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" class="logo" alt="Davinto Logo" />
-    <h1>Davinto Tech Hub</h1>
-    <p>Showcasing tech skills, gathering minds, and teaching tech 🔥</p>
-  </header>
 
-  <main class="centered">
-    <div id="auth-box">
-      <h2 id="form-title">Login</h2>
+  <div class="container">
+    <h2 id="form-title">Login</h2>
 
-      <input type="text" id="username" placeholder="Username (for signup only)" style="display:none;"><br>
-      <input type="email" id="email" placeholder="Email" required><br>
-      <input type="password" id="password" placeholder="Password" required><br>
+    <input type="text" id="username" placeholder="Username (only for signup)">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
 
-      <button onclick="handleAuth()" class="btn" id="auth-btn">Login</button>
-      <p id="toggle-text">Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a></p>
-      <p id="msg"></p>
+    <button onclick="handleAuth()" class="btn" id="auth-btn">Login</button>
+
+    <p id="toggle-text">
+      Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>
+    </p>
+
+    <p id="msg"></p>
+
+    <div class="link">
+      <a href="homepage.html">← Back to Homepage</a>
     </div>
-  </main>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 Davinto Tech Hub. Powered by Firebase.</p>
-  </footer>
-
-  <!-- Firebase SDK -->
+  <!-- Firebase Auth Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -61,57 +120,52 @@
         isLogin
           ? `Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>`
           : `Already have an account? <a href="#" onclick="toggleMode()">Login</a>`;
-      document.getElementById("msg").textContent = "";
       document.getElementById("username").style.display = isLogin ? "none" : "block";
+      document.getElementById("msg").textContent = "";
     };
 
     window.handleAuth = async function () {
-      const username = document.getElementById("username").value.trim();
+      const username = document.getElementById("username").value.trim().toLowerCase();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const msg = document.getElementById("msg");
 
       if (!email || !password || (!isLogin && !username)) {
-        msg.textContent = "Please fill in all fields!";
+        msg.textContent = "Please fill all fields.";
         return;
       }
 
-      if (isLogin) {
-        // Login
-        try {
+      try {
+        if (isLogin) {
           await signInWithEmailAndPassword(auth, email, password);
           msg.textContent = "Login successful!";
           setTimeout(() => window.location.href = "chat.html", 1000);
-        } catch (error) {
-          msg.textContent = error.message;
-        }
-      } else {
-        // Signup
-        try {
-          const userSnapshot = await get(child(ref(db), `usernames/${username}`));
-          if (userSnapshot.exists()) {
-            msg.textContent = "Username already taken!";
+        } else {
+          const usernameSnap = await get(child(ref(db), `usernames/${username}`));
+          if (usernameSnap.exists()) {
+            msg.textContent = "Username already taken.";
             return;
           }
 
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const uid = userCredential.user.uid;
+          const userCred = await createUserWithEmailAndPassword(auth, email, password);
+          const uid = userCred.user.uid;
 
-          // Save username in two places: /users/{uid} and /usernames/{username}
           await set(ref(db, `users/${uid}`), {
-            email: email,
-            username: username
+            email,
+            username
           });
 
           await set(ref(db, `usernames/${username}`), uid);
 
+          msg.style.color = "green";
           msg.textContent = "Signup successful!";
           setTimeout(() => window.location.href = "chat.html", 1000);
-        } catch (error) {
-          msg.textContent = error.message;
         }
+      } catch (error) {
+        msg.textContent = error.message;
       }
     };
   </script>
+
 </body>
 </html>
