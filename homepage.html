@@ -3,228 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Davinto Tech Hub - Home</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Homepage | Davinto Tech Hub</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      scroll-behavior: smooth;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f6f8;
-      color: #2d3436;
-    }
-
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #0c2461;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
       color: white;
-      padding: 15px 30px;
+      text-align: center;
+      padding: 60px 20px;
+      transition: background 0.3s, color 0.3s;
     }
 
-    nav .logo {
-      display: flex;
-      align-items: center;
+    body.dark {
+      background: #fff;
+      color: #222;
     }
 
-    nav .logo img {
-      width: 40px;
-      margin-right: 10px;
-    }
-
-    nav a {
+    .toggle-mode {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #aaa;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
       color: white;
-      text-decoration: none;
-      margin-left: 20px;
-      font-weight: bold;
     }
 
-    header.hero {
-      background: url('hero.jpg') no-repeat center center/cover;
-      color: white;
-      height: 80vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      flex-direction: column;
-      padding: 20px;
+    body.dark .toggle-mode {
+      background: rgba(0, 0, 0, 0.1);
+      color: black;
+      border-color: #333;
     }
 
-    header.hero h1 {
-      font-size: 3em;
-      animation: fadeIn 1s ease-in-out;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      margin-top: 50px;
     }
 
-    header.hero p {
-      font-size: 1.2em;
-      margin-top: 10px;
-      animation: fadeIn 1.5s ease-in-out;
-    }
-
-    .section {
-      max-width: 1000px;
-      margin: 60px auto;
-      padding: 20px;
-    }
-
-    .section h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #0c2461;
-    }
-
-    .team, .blog {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      text-align: center;
-    }
-
-    .team-member, .blog-post {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      animation: fadeInUp 1s ease;
-    }
-
-    .team-member img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
+    h1 {
+      font-size: 2.5em;
       margin-bottom: 10px;
     }
 
-    .blog-post h4 {
-      margin: 10px 0 5px;
+    h3 {
+      color: #00cec9;
+      margin-bottom: 30px;
     }
 
-    .blog-post p {
-      font-size: 0.9em;
-    }
-
-    .cta {
-      text-align: center;
-      margin: 40px 0;
-    }
-
-    .cta a {
+    .btn {
+      padding: 12px 25px;
+      margin: 15px 10px;
+      border: none;
       background: #00b894;
       color: white;
-      padding: 12px 25px;
-      border-radius: 5px;
-      text-decoration: none;
-      font-weight: bold;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
     }
 
-    footer {
-      background: #dfe6e9;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9em;
-      margin-top: 60px;
+    .btn:hover {
+      background: #019875;
     }
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-20px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    @keyframes fadeInUp {
-      from {opacity: 0; transform: translateY(40px);}
-      to {opacity: 1; transform: translateY(0);}
+    audio {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 600px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
-  <nav>
-    <div class="logo">
-      <img src="logo.png" alt="Logo">
-      <span>Davinto Tech Hub</span>
-    </div>
-    <div>
-      <a href="index.html">Login</a>
-      <a href="profile.html">Profile</a>
-      <a href="chat.html">Chat</a>
-    </div>
-  </nav>
+  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
 
-  <!-- Hero Section -->
-  <header class="hero">
+  <div class="container">
     <h1>Welcome to Davinto Tech Hub</h1>
-    <p>Where minds connect, build, and grow in tech 🌍</p>
-  </header>
+    <h3 id="greeting">Empowering future tech enthusiasts...</h3>
 
-  <!-- About Section -->
-  <div class="section" id="about">
-    <h2>About Us</h2>
-    <p>
-      Davinto Tech Hub is your online base to connect with other tech minds,
-      share your ideas, and grow together. Whether you're a beginner or a pro,
-      you'll find a community here that supports, inspires, and builds.
-    </p>
+    <button class="btn" onclick="location.href='chat.html'">Global Chat</button>
+    <button class="btn" onclick="location.href='profile.html'">Edit Profile</button>
+    <button class="btn" onclick="logout()">Logout</button>
+
+    <audio autoplay loop controls>
+      <source src="music/track.mp3" type="audio/mpeg" />
+    </audio>
   </div>
 
-  <!-- Meet the Team Section -->
-  <div class="section" id="team">
-    <h2>Meet the Team</h2>
-    <div class="team">
-      <div class="team-member">
-        <img src="avatar1.png" alt="Davinto">
-        <h4>Davinto</h4>
-        <p>Founder / Fullstack Dev</p>
-      </div>
-      <div class="team-member">
-        <img src="avatar2.png" alt="Team Member">
-        <h4>Grace</h4>
-        <p>Product Designer</p>
-      </div>
-      <div class="team-member">
-        <img src="avatar3.png" alt="Team Member">
-        <h4>Mike</h4>
-        <p>Community Manager</p>
-      </div>
-    </div>
-  </div>
+  <!-- Firebase logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <!-- Blog / News Section -->
-  <div class="section" id="blog">
-    <h2>Latest Updates</h2>
-    <div class="blog">
-      <div class="blog-post">
-        <h4>🚀 We launched!</h4>
-        <p>Davinto Tech Hub is now live. Start chatting and learning!</p>
-      </div>
-      <div class="blog-post">
-        <h4>📚 Free JS Bootcamp</h4>
-        <p>Join our JavaScript bootcamp this month — totally free.</p>
-      </div>
-      <div class="blog-post">
-        <h4>🛠️ Build with us</h4>
-        <p>We're looking for contributors. Want to join the team?</p>
-      </div>
-    </div>
-  </div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
+      authDomain: "davinto-tech-hub.firebaseapp.com",
+      projectId: "davinto-tech-hub",
+      storageBucket: "davinto-tech-hub.appspot.com",
+      messagingSenderId: "682350610303",
+      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
+      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
+    };
 
-  <!-- Call to Action -->
-  <div class="cta">
-    <a href="index.html">Join the Community</a>
-  </div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2025 Davinto Tech Hub. Powered by Firebase & Love ❤️<br>
-    Contact: <a href="mailto:DavintoTech@gmail.com">DavintoTech@gmail.com</a> | WhatsApp: <a href="https://wa.me/2348169045105">+2348169045105</a>
-  </footer>
+    function toggleMode() {
+      document.body.classList.toggle('dark');
+      document.querySelector('.toggle-mode').textContent = 
+        document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const uid = user.uid;
+      const userRef = ref(db, `users/${uid}`);
+      const snap = await get(userRef);
+      const username = snap.exists() ? snap.val().username : "Guest";
+
+      document.getElementById("greeting").textContent = `Hello, ${username}! 👋`;
+    });
+  </script>
 
 </body>
 </html>
