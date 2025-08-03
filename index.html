@@ -17,6 +17,7 @@
     <div id="auth-box">
       <h2 id="form-title">Login</h2>
 
+      <input type="text" id="username" placeholder="Username (for signup only)" style="display:none;"><br>
       <input type="email" id="email" placeholder="Email" required><br>
       <input type="password" id="password" placeholder="Password" required><br>
 
@@ -30,10 +31,11 @@
     <p>&copy; 2025 Davinto Tech Hub. Powered by Firebase.</p>
   </footer>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
@@ -41,11 +43,13 @@
       projectId: "davinto-tech-hub",
       storageBucket: "davinto-tech-hub.appspot.com",
       messagingSenderId: "682350610303",
-      appId: "1:682350610303:web:ce91a8e11033312f57fc4a"
+      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
+      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getDatabase(app);
 
     let isLogin = true;
 
@@ -58,36 +62,54 @@
           ? `Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>`
           : `Already have an account? <a href="#" onclick="toggleMode()">Login</a>`;
       document.getElementById("msg").textContent = "";
+      document.getElementById("username").style.display = isLogin ? "none" : "block";
     };
 
-    window.handleAuth = function () {
+    window.handleAuth = async function () {
+      const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const msg = document.getElementById("msg");
 
-      if (!email || !password) {
-        msg.textContent = "Fill in all fields!";
+      if (!email || !password || (!isLogin && !username)) {
+        msg.textContent = "Please fill in all fields!";
         return;
       }
 
       if (isLogin) {
-        signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            msg.textContent = "Login successful! Redirecting...";
-            setTimeout(() => window.location.href = "chat.html", 1000);
-          })
-          .catch(error => {
-            msg.textContent = error.message;
-          });
+        // Login
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          msg.textContent = "Login successful!";
+          setTimeout(() => window.location.href = "chat.html", 1000);
+        } catch (error) {
+          msg.textContent = error.message;
+        }
       } else {
-        createUserWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            msg.textContent = "Sign up successful! Redirecting...";
-            setTimeout(() => window.location.href = "chat.html", 1000);
-          })
-          .catch(error => {
-            msg.textContent = error.message;
+        // Signup
+        try {
+          const userSnapshot = await get(child(ref(db), `usernames/${username}`));
+          if (userSnapshot.exists()) {
+            msg.textContent = "Username already taken!";
+            return;
+          }
+
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const uid = userCredential.user.uid;
+
+          // Save username in two places: /users/{uid} and /usernames/{username}
+          await set(ref(db, `users/${uid}`), {
+            email: email,
+            username: username
           });
+
+          await set(ref(db, `usernames/${username}`), uid);
+
+          msg.textContent = "Signup successful!";
+          setTimeout(() => window.location.href = "chat.html", 1000);
+        } catch (error) {
+          msg.textContent = error.message;
+        }
       }
     };
   </script>
