@@ -73,11 +73,11 @@
   <div class="container">
     <h2 id="form-title">Login</h2>
 
-    <input type="text" id="username" placeholder="Username (only for signup)">
+    <input type="text" id="username" placeholder="Username (for sign up only)">
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Password" required>
 
-    <button onclick="handleAuth()" class="btn" id="auth-btn">Login</button>
+    <button id="auth-btn" class="btn">Login</button>
 
     <p id="toggle-text">
       Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>
@@ -112,38 +112,44 @@
 
     let isLogin = true;
 
-    window.toggleMode = function () {
-      isLogin = !isLogin;
-      document.getElementById("form-title").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("auth-btn").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("toggle-text").innerHTML =
-        isLogin
-          ? `Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>`
-          : `Already have an account? <a href="#" onclick="toggleMode()">Login</a>`;
-      document.getElementById("username").style.display = isLogin ? "none" : "block";
-      document.getElementById("msg").textContent = "";
-    };
+    const formTitle = document.getElementById("form-title");
+    const authBtn = document.getElementById("auth-btn");
+    const toggleText = document.getElementById("toggle-text");
+    const msg = document.getElementById("msg");
 
-    window.handleAuth = async function () {
-      const username = document.getElementById("username").value.trim().toLowerCase();
+    authBtn.onclick = handleAuth;
+
+    function toggleMode() {
+      isLogin = !isLogin;
+      formTitle.textContent = isLogin ? "Login" : "Sign Up";
+      authBtn.textContent = isLogin ? "Login" : "Sign Up";
+      toggleText.innerHTML = isLogin
+        ? `Don't have an account? <a href="#" onclick="toggleMode()">Sign up</a>`
+        : `Already have an account? <a href="#" onclick="toggleMode()">Login</a>`;
+      document.getElementById("username").style.display = isLogin ? "none" : "block";
+      msg.textContent = "";
+    }
+
+    async function handleAuth() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
-      const msg = document.getElementById("msg");
+      const username = document.getElementById("username").value.trim().toLowerCase();
 
       if (!email || !password || (!isLogin && !username)) {
-        msg.textContent = "Please fill all fields.";
+        msg.textContent = "Please fill in all fields.";
         return;
       }
 
       try {
         if (isLogin) {
           await signInWithEmailAndPassword(auth, email, password);
-          msg.textContent = "Login successful!";
+          msg.textContent = "Logged in!";
           setTimeout(() => window.location.href = "chat.html", 1000);
         } else {
-          const usernameSnap = await get(child(ref(db), `usernames/${username}`));
-          if (usernameSnap.exists()) {
-            msg.textContent = "Username already taken.";
+          const usernameRef = ref(db, `usernames/${username}`);
+          const snap = await get(usernameRef);
+          if (snap.exists()) {
+            msg.textContent = "Username already exists!";
             return;
           }
 
@@ -162,9 +168,10 @@
           setTimeout(() => window.location.href = "chat.html", 1000);
         }
       } catch (error) {
+        msg.style.color = "red";
         msg.textContent = error.message;
       }
-    };
+    }
   </script>
 
 </body>
