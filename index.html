@@ -17,69 +17,64 @@
       overflow: hidden;
     }
 
-    /* 🔥 Background Video */
-    #bg-video {
+    video.bg-video {
       position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100%;
-      min-height: 100%;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       z-index: -1;
+      filter: brightness(0.5);
     }
 
     .container {
       position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      z-index: 2;
+      max-width: 420px;
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 40px 30px;
+      border-radius: 15px;
+      text-align: center;
+      animation: fadeIn 1s ease;
     }
 
-    .box {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 40px 30px;
-      border-radius: 12px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    body.dark .container {
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
     }
 
     .logo {
-      width: 90px;
-      height: 90px;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #00b894;
-      margin-bottom: 20px;
     }
 
     h1 {
-      font-size: 24px;
-      color: #2d3436;
       margin-bottom: 10px;
     }
 
     p {
+      margin-bottom: 30px;
       font-size: 15px;
-      color: #636e72;
-      margin-bottom: 25px;
     }
 
     .btn {
-      display: block;
       width: 100%;
       padding: 12px;
       margin: 10px 0;
       font-size: 16px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       color: white;
       cursor: pointer;
+      transition: 0.3s;
     }
 
     .login-btn {
@@ -94,34 +89,66 @@
       opacity: 0.9;
     }
 
-    @media (max-width: 480px) {
-      .box {
-        padding: 25px 20px;
-      }
+    .toggle-theme {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 5;
+    }
 
-      h1 {
-        font-size: 20px;
+    body.dark .toggle-theme {
+      background: #222;
+      color: white;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media(max-width: 500px) {
+      .container {
+        width: 90%;
+        padding: 30px 20px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔥 Background Video (Replace with your own .mp4) -->
-  <video autoplay muted loop id="bg-video">
-    <source src="bg.mp4" type="video/mp4" />
-    Your browser does not support HTML5 video.
+  <!-- 🌙 / ☀️ Toggle -->
+  <div class="toggle-theme" onclick="toggleTheme()">🌙 Dark Mode</div>
+
+  <!-- 🔄 Background Tech Video -->
+  <video autoplay muted loop class="bg-video">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-hud-user-interface-on-a-computer-995-large.mp4" type="video/mp4">
+    Your browser does not support the video tag.
   </video>
 
   <div class="container">
-    <div class="box">
-      <img src="logo.png" alt="Davinto Logo" class="logo" />
-      <h1>Welcome to Davinto Tech Hub</h1>
-      <p>Showcasing tech skills, gathering enthusiasts, and teaching future innovators.</p>
-      <button class="btn login-btn" onclick="location.href='login.html'">Login</button>
-      <button class="btn signup-btn" onclick="location.href='signup.html'">Sign Up</button>
-    </div>
+    <!-- 🔥 Logo -->
+    <img src="logo.png" alt="Davinto Logo" class="logo">
+
+    <h1>Welcome to Davinto Tech Hub</h1>
+    <p>Showcasing tech skills, empowering enthusiasts, and teaching future innovators.</p>
+
+    <button class="btn login-btn" onclick="location.href='login.html'">Login</button>
+    <button class="btn signup-btn" onclick="location.href='signup.html'">Sign Up</button>
   </div>
 
+  <script>
+    // 🌓 Toggle between light/dark
+    function toggleTheme() {
+      const body = document.body;
+      body.classList.toggle('dark');
+      const toggleBtn = document.querySelector('.toggle-theme');
+      toggleBtn.innerHTML = body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+  </script>
 </body>
 </html>
