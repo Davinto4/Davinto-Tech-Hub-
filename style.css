@@ -54,3 +54,19 @@ button {
   background: #fff;
   margin-bottom: 10px;
 }
+
+.auth-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 20px;
+}
+
+.auth-buttons .btn {
+  background: #00b894;
+  color: #fff;
+  padding: 10px 25px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
