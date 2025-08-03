@@ -156,7 +156,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
@@ -196,16 +196,17 @@
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCred.user.uid;
 
-        await set(ref(db, `users/${uid}`), {
-          email,
-          username
-        });
-
+        await set(ref(db, `users/${uid}`), { email, username });
         await set(ref(db, `usernames/${username}`), uid);
 
         msg.style.color = "green";
-        msg.textContent = "Signup successful! Redirecting...";
-        setTimeout(() => window.location.href = "homepage.html", 1500);
+        msg.textContent = "Signup successful! Logging you in...";
+
+        // ✅ Auto login and redirect
+        alert(`Welcome ${username}! Your account has been created.`);
+        setTimeout(() => {
+          window.location.href = "homepage.html";
+        }, 1000);
       } catch (error) {
         msg.style.color = "red";
         msg.textContent = error.message;
