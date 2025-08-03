@@ -1,81 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up | Davinto Tech Hub</title>
+  <title>Signup - Davinto Tech Hub</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f1f1f1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    button {
-      padding: 12px 25px;
-      border: none;
-      background: #00b894;
-      color: white;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #msg {
-      margin-top: 10px;
-      color: red;
-    }
-
-    a {
-      display: block;
-      margin-top: 15px;
-      text-decoration: none;
-      color: #0984e3;
-    }
-  </style>
 </head>
 <body>
-
-  <div class="container">
-    <h2>Sign Up</h2>
-
-    <input type="text" id="username" placeholder="Username (unique)" />
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="signupBtn">Sign Up</button>
-
-    <p id="msg"></p>
-    <a href="index.html">← Back to Welcome Page</a>
-  </div>
+  <h2>Sign Up</h2>
+  <input type="text" id="username" placeholder="Username" /><br />
+  <input type="email" id="email" placeholder="Email" /><br />
+  <input type="password" id="password" placeholder="Password" /><br />
+  <button onclick="signup()">Sign Up</button>
+  <p id="msg"></p>
 
   <script>
     const firebaseConfig = {
@@ -92,44 +29,36 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    document.getElementById("signupBtn").addEventListener("click", async () => {
+    async function signup() {
       const username = document.getElementById("username").value.trim().toLowerCase();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const msg = document.getElementById("msg");
 
-      msg.style.color = "red";
-
       if (!username || !email || !password) {
-        msg.textContent = "Please fill in all fields.";
+        msg.innerText = "Fill all fields.";
         return;
       }
 
       try {
-        const usernameRef = db.ref(`usernames/${username}`);
-        const snapshot = await usernameRef.get();
-
-        if (snapshot.exists()) {
-          msg.textContent = "Username already taken.";
+        const userRef = db.ref("usernames/" + username);
+        const exists = await userRef.get();
+        if (exists.exists()) {
+          msg.innerText = "Username taken!";
           return;
         }
 
         const userCred = await auth.createUserWithEmailAndPassword(email, password);
         const uid = userCred.user.uid;
+        await db.ref("users/" + uid).set({ username, email });
+        await userRef.set(uid);
 
-        await db.ref(`users/${uid}`).set({ email, username });
-        await usernameRef.set(uid);
-
-        msg.style.color = "green";
-        msg.textContent = "Signup successful! Redirecting...";
         alert("Welcome " + username + "!");
-        setTimeout(() => {
-          window.location.href = "homepage.html";
-        }, 1500);
+        window.location.href = "homepage.html";
       } catch (error) {
-        msg.textContent = error.message;
+        msg.innerText = error.message;
       }
-    });
+    }
   </script>
 </body>
 </html>
