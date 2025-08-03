@@ -3,219 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Davinto Tech Hub</title>
+  <title>Welcome | Davinto Tech Hub</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body, html {
-      height: 100%;
+    body {
       font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+      transition: background 0.3s, color 0.3s;
     }
 
-    video.bg-video {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-      filter: brightness(0.4);
+    body.dark {
+      background: #fff;
+      color: #222;
     }
 
     .container {
-      position: relative;
-      z-index: 2;
-      max-width: 420px;
+      max-width: 700px;
       margin: auto;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(8px);
-      padding: 40px 30px;
-      border-radius: 15px;
-      text-align: center;
-    }
-
-    body.dark .container {
-      background: rgba(0, 0, 0, 0.8);
-      color: #fff;
     }
 
     .logo {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      object-fit: cover;
       border: 3px solid #00b894;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 2.8em;
       margin-bottom: 15px;
     }
 
-    h2 {
-      margin-bottom: 10px;
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
     }
 
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 6px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-    }
-
-    button {
+    .btn {
+      padding: 12px 25px;
+      margin: 10px;
+      border: none;
       background: #00b894;
       color: white;
-      border: none;
+      border-radius: 8px;
+      font-size: 1em;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
-    button:hover {
-      opacity: 0.9;
+    .btn:hover {
+      background: #019875;
     }
 
-    #msg {
-      margin-top: 10px;
-      color: red;
-    }
-
-    #username {
-      display: none;
-    }
-
-    .toggle-theme {
+    .toggle-mode {
       position: absolute;
-      top: 20px;
+      top: 15px;
       right: 20px;
-      background: #fff;
-      padding: 6px 12px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #aaa;
+      padding: 5px 12px;
       border-radius: 20px;
       font-size: 14px;
-      cursor: pointer;
-      z-index: 5;
-    }
-
-    body.dark .toggle-theme {
-      background: #222;
       color: white;
     }
 
-    .switch-mode {
-      margin-top: 10px;
+    body.dark .toggle-mode {
+      background: rgba(0, 0, 0, 0.1);
+      color: black;
+      border-color: #333;
     }
 
-    a {
-      color: #0984e3;
-      text-decoration: none;
+    audio {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 600px;
     }
   </style>
 </head>
 <body>
 
-  <div class="toggle-theme" onclick="toggleTheme()">🌙 Dark Mode</div>
-
-  <video autoplay muted loop class="bg-video">
-    <source src="https://assets.mixkit.co/videos/preview/mixkit-hud-user-interface-on-a-computer-995-large.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
 
   <div class="container">
-    <img src="logo.png" alt="Davinto Logo" class="logo">
-    <h2 id="formTitle">Login</h2>
+    <img src="logo.png" alt="Davinto Tech Hub Logo" class="logo" />
 
-    <input type="text" id="username" placeholder="Username (signup only)">
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <h1>Welcome to Davinto Tech Hub</h1>
+    <p>A place to showcase tech skills, connect with enthusiasts, and empower future innovators.</p>
 
-    <button id="authBtn">Login</button>
-    <p id="msg"></p>
+    <button class="btn" onclick="location.href='signup.html'">Sign Up</button>
+    <button class="btn" onclick="location.href='login.html'">Login</button>
 
-    <div class="switch-mode">
-      <span id="toggleText">Don't have an account? <a href="#" onclick="toggleForm()">Sign up</a></span>
-    </div>
+    <audio id="bg-music" controls autoplay loop>
+      <source src="music/track1.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
-      authDomain: "davinto-tech-hub.firebaseapp.com",
-      projectId: "davinto-tech-hub",
-      storageBucket: "davinto-tech-hub.appspot.com",
-      messagingSenderId: "682350610303",
-      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
-      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    let isLogin = true;
-
-    window.toggleForm = function () {
-      isLogin = !isLogin;
-      document.getElementById("formTitle").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("authBtn").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("toggleText").innerHTML = isLogin
-        ? `Don't have an account? <a href="#" onclick="toggleForm()">Sign up</a>`
-        : `Already have an account? <a href="#" onclick="toggleForm()">Login</a>`;
-      document.getElementById("username").style.display = isLogin ? "none" : "block";
-      document.getElementById("msg").textContent = "";
-    };
-
-    document.getElementById("authBtn").addEventListener("click", async () => {
-      const username = document.getElementById("username").value.trim().toLowerCase();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const msg = document.getElementById("msg");
-
-      if (!email || !password || (!isLogin && !username)) {
-        msg.style.color = "red";
-        msg.textContent = "Please fill in all fields.";
-        return;
-      }
-
-      try {
-        if (isLogin) {
-          await signInWithEmailAndPassword(auth, email, password);
-          msg.style.color = "green";
-          msg.textContent = "Login successful!";
-          setTimeout(() => window.location.href = "homepage.html", 1500);
-        } else {
-          const usernameSnap = await get(child(ref(db), `usernames/${username}`));
-          if (usernameSnap.exists()) {
-            msg.style.color = "red";
-            msg.textContent = "Username already taken.";
-            return;
-          }
-
-          const userCred = await createUserWithEmailAndPassword(auth, email, password);
-          const uid = userCred.user.uid;
-
-          await set(ref(db, `users/${uid}`), { email, username });
-          await set(ref(db, `usernames/${username}`), uid);
-
-          msg.style.color = "green";
-          msg.textContent = "Signup successful!";
-          alert(`Welcome ${username}!`);
-          setTimeout(() => window.location.href = "homepage.html", 1500);
-        }
-      } catch (error) {
-        msg.style.color = "red";
-        msg.textContent = error.message;
-      }
-    });
-
-    window.toggleTheme = function () {
+  <script>
+    function toggleMode() {
       document.body.classList.toggle('dark');
-      const toggleBtn = document.querySelector('.toggle-theme');
-      toggleBtn.innerHTML = document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
-    };
+      const toggle = document.querySelector('.toggle-mode');
+      toggle.textContent = document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+
+    // Optional Shuffle Logic (if you want random music on load)
+    const totalTracks = 100; // Update this if more or less
+    const trackNumber = Math.floor(Math.random() * totalTracks) + 1;
+    document.getElementById('bg-music').src = `music/track${trackNumber}.mp3`;
   </script>
+
 </body>
 </html>
