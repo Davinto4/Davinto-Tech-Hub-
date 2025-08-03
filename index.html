@@ -99,8 +99,8 @@
     <button class="btn" onclick="location.href='signup.html'">Sign Up</button>
     <button class="btn" onclick="location.href='login.html'">Login</button>
 
-    <audio id="bg-music" controls autoplay loop>
-      <source src="music/track1.mp3" type="audio/mpeg">
+    <audio autoplay loop controls>
+      <source src="music/track.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
   </div>
@@ -111,11 +111,6 @@
       const toggle = document.querySelector('.toggle-mode');
       toggle.textContent = document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
     }
-
-    // Optional Shuffle Logic (if you want random music on load)
-    const totalTracks = 100; // Update this if more or less
-    const trackNumber = Math.floor(Math.random() * totalTracks) + 1;
-    document.getElementById('bg-music').src = `music/track${trackNumber}.mp3`;
   </script>
 
 </body>
