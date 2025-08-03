@@ -3,17 +3,164 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Davinto Tech Hub</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="module" src="login.js"></script>
+  <title>Login | Davinto Tech Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background: #fff;
+      color: #222;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      margin-top: 20px;
+      border: none;
+      background: #00b894;
+      color: white;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #019875;
+    }
+
+    .toggle-mode {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #aaa;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: white;
+    }
+
+    body.dark .toggle-mode {
+      background: rgba(0, 0, 0, 0.1);
+      color: black;
+      border-color: #333;
+    }
+
+    audio {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    #msg {
+      color: red;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-  <div class="auth-container">
-    <h2>Login</h2>
-    <input id="email" placeholder="Email" type="email" />
-    <input id="password" placeholder="Password" type="password" />
-    <button id="loginBtn">Login</button>
+
+  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
+
+  <div class="container">
+    <h1>Welcome Back</h1>
+    <p>Login to explore and connect with the tech world</p>
+
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button class="btn" onclick="handleLogin()">Login</button>
+
     <p id="msg"></p>
+    <p><a href="index.html" style="color:#00cec9;">← Back to welcome</a></p>
+
+    <audio autoplay loop controls>
+      <source src="music/track.mp3" type="audio/mpeg" />
+    </audio>
   </div>
+
+  <!-- Firebase logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
+      authDomain: "davinto-tech-hub.firebaseapp.com",
+      projectId: "davinto-tech-hub",
+      storageBucket: "davinto-tech-hub.appspot.com",
+      messagingSenderId: "682350610303",
+      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
+      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    window.toggleMode = function () {
+      document.body.classList.toggle('dark');
+      const toggle = document.querySelector('.toggle-mode');
+      toggle.textContent = document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+    };
+
+    window.handleLogin = async function () {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
+
+      if (!email || !password) {
+        msg.textContent = "Please fill in both fields.";
+        return;
+      }
+
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        const uid = userCred.user.uid;
+
+        const userRef = ref(db, `users/${uid}`);
+        const snap = await get(userRef);
+        const username = snap.exists() ? snap.val().username : "";
+
+        alert(`Welcome back${username ? ', ' + username : ''}!`);
+        window.location.href = "homepage.html";
+      } catch (error) {
+        msg.textContent = error.message;
+      }
+    };
+  </script>
+
 </body>
 </html>
