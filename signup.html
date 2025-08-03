@@ -4,161 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up | Davinto Tech Hub</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body, html {
-      height: 100%;
+    body {
       font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
-    }
-
-    video.bg-video {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-      filter: brightness(0.5);
+      background: #f1f1f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
 
     .container {
-      position: relative;
-      z-index: 2;
-      max-width: 420px;
-      margin: auto;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(8px);
-      padding: 40px 30px;
-      border-radius: 15px;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
       text-align: center;
-      animation: fadeIn 1s ease;
-    }
-
-    body.dark .container {
-      background: rgba(0, 0, 0, 0.85);
-      color: #fff;
-    }
-
-    .logo {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 20px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #00b894;
     }
 
     h2 {
-      margin-bottom: 10px;
-    }
-
-    p {
       margin-bottom: 20px;
-      font-size: 15px;
     }
 
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 6px;
-      font-size: 16px;
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
       border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
     button {
+      padding: 12px 25px;
+      border: none;
       background: #00b894;
       color: white;
-      border: none;
+      border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
     }
 
     #msg {
-      margin-top: 12px;
+      margin-top: 10px;
       color: red;
     }
 
-    .link {
-      margin-top: 15px;
-    }
-
     a {
-      color: #0984e3;
+      display: block;
+      margin-top: 15px;
       text-decoration: none;
-    }
-
-    .toggle-theme {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: #fff;
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 14px;
-      cursor: pointer;
-      z-index: 5;
-    }
-
-    body.dark .toggle-theme {
-      background: #222;
-      color: white;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media(max-width: 500px) {
-      .container {
-        width: 90%;
-        padding: 30px 20px;
-      }
+      color: #0984e3;
     }
   </style>
 </head>
 <body>
 
-  <div class="toggle-theme" onclick="toggleTheme()">🌙 Dark Mode</div>
-
-  <video autoplay muted loop class="bg-video">
-    <source src="https://assets.mixkit.co/videos/preview/mixkit-hud-user-interface-on-a-computer-995-large.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-
   <div class="container">
-    <img src="logo.png" alt="Davinto Logo" class="logo">
+    <h2>Sign Up</h2>
 
-    <h2>Create Account</h2>
-    <p>Sign up with a unique username and email to get started</p>
-
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-
+    <input type="text" id="username" placeholder="Username (unique)" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
     <button id="signupBtn">Sign Up</button>
 
     <p id="msg"></p>
-
-    <div class="link">
-      Already have an account? <a href="login.html">Login here</a><br>
-      <a href="index.html">← Back to Welcome Page</a>
-    </div>
+    <a href="index.html">← Back to Welcome Page</a>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
       authDomain: "davinto-tech-hub.firebaseapp.com",
@@ -169,9 +88,9 @@
       databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
     document.getElementById("signupBtn").addEventListener("click", async () => {
       const username = document.getElementById("username").value.trim().toLowerCase();
@@ -179,47 +98,38 @@
       const password = document.getElementById("password").value.trim();
       const msg = document.getElementById("msg");
 
+      msg.style.color = "red";
+
       if (!username || !email || !password) {
-        msg.style.color = "red";
         msg.textContent = "Please fill in all fields.";
         return;
       }
 
       try {
-        const usernameSnap = await get(child(ref(db), `usernames/${username}`));
-        if (usernameSnap.exists()) {
-          msg.style.color = "red";
-          msg.textContent = "Username is already taken!";
+        const usernameRef = db.ref(`usernames/${username}`);
+        const snapshot = await usernameRef.get();
+
+        if (snapshot.exists()) {
+          msg.textContent = "Username already taken.";
           return;
         }
 
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        const userCred = await auth.createUserWithEmailAndPassword(email, password);
         const uid = userCred.user.uid;
 
-        await set(ref(db, `users/${uid}`), { email, username });
-        await set(ref(db, `usernames/${username}`), uid);
+        await db.ref(`users/${uid}`).set({ email, username });
+        await usernameRef.set(uid);
 
         msg.style.color = "green";
-        msg.textContent = "Signup successful! Logging you in...";
-
-        // ✅ Auto login and redirect
-        alert(`Welcome ${username}! Your account has been created.`);
+        msg.textContent = "Signup successful! Redirecting...";
+        alert("Welcome " + username + "!");
         setTimeout(() => {
           window.location.href = "homepage.html";
-        }, 1000);
+        }, 1500);
       } catch (error) {
-        msg.style.color = "red";
         msg.textContent = error.message;
       }
     });
-
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('dark');
-      const toggleBtn = document.querySelector('.toggle-theme');
-      toggleBtn.innerHTML = body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
-    }
   </script>
-
 </body>
 </html>
