@@ -175,7 +175,8 @@
       const msg = document.getElementById("msg");
 
       if (!email || !password || (!isLogin && !username)) {
-        msg.textContent = "Please fill all fields.";
+        msg.style.color = "red";
+        msg.textContent = "Please fill in all fields.";
         return;
       }
 
@@ -188,6 +189,7 @@
         } else {
           const usernameSnap = await get(child(ref(db), `usernames/${username}`));
           if (usernameSnap.exists()) {
+            msg.style.color = "red";
             msg.textContent = "Username already taken.";
             return;
           }
