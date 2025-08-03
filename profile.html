@@ -3,23 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profile - Davinto Tech Hub</title>
+  <title>Profile | Davinto Tech Hub</title>
   <link rel="stylesheet" href="style.css" />
-  <script type="module" src="profile.js"></script>
+  <style>
+    .profile-container {
+      max-width: 400px;
+      margin: 40px auto;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      margin: 10px auto;
+    }
+
+    .btn {
+      background: #00b894;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .btn:hover {
+      background: #019875;
+    }
+
+    #msg {
+      margin-top: 10px;
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <nav>
-    <img src="logo.png" class="logo" alt="Davinto Logo" />
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="chat.html">Chat</a>
-    <a href="profile.html">Profile</a>
-  </nav>
-  <div class="container">
-    <h2>Edit Profile</h2>
-    <input id="nameInput" placeholder="Enter your name" type="text" />
-    <button id="saveBtn">Save</button>
-    <p id="status"></p>
+  <header>
+    <h1>Davinto Tech Hub</h1>
+    <p>Edit Your Profile</p>
+  </header>
+
+  <div class="profile-container">
+    <h2>Your Profile</h2>
+    <input type="text" id="new-username" placeholder="Enter new username" />
+    <button class="btn" onclick="updateUsername()">Update Username</button>
+    <p id="msg"></p>
+
+    <br><br>
+    <button class="btn" onclick="logout()">Logout</button>
+    <br><br>
+    <a href="chat.html">← Back to Chat</a>
   </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
+      authDomain: "davinto-tech-hub.firebaseapp.com",
+      projectId: "davinto-tech-hub",
+      storageBucket: "davinto-tech-hub.appspot.com",
+      messagingSenderId: "682350610303",
+      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
+      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUID = "";
+    let currentUsername = "";
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        currentUID = user.uid;
+
+        const userSnap = await get(ref(db, `users/${currentUID}`));
+        if (userSnap.exists()) {
+          currentUsername = userSnap.val().username;
+          document.getElementById("new-username").value = currentUsername;
+        }
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    window.updateUsername = async function () {
+      const newUsername = document.getElementById("new-username").value.trim().toLowerCase();
+      const msg = document.getElementById("msg");
+
+      if (!newUsername) {
+        msg.textContent = "Username cannot be empty!";
+        return;
+      }
+
+      if (newUsername === currentUsername) {
+        msg.textContent = "That's already your current username.";
+        return;
+      }
+
+      // Check if username is taken
+      const existing = await get(ref(db, `usernames/${newUsername}`));
+      if (existing.exists()) {
+        msg.textContent = "That username is already taken!";
+        return;
+      }
+
+      // Remove old username mapping
+      await remove(ref(db, `usernames/${currentUsername}`));
+
+      // Save new username
+      await set(ref(db, `usernames/${newUsername}`), currentUID);
+      await set(ref(db, `users/${currentUID}/username`), newUsername);
+
+      msg.style.color = "green";
+      msg.textContent = "Username updated successfully!";
+      currentUsername = newUsername;
+    };
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    };
+  </script>
 </body>
 </html>
