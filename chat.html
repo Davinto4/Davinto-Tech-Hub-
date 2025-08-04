@@ -102,13 +102,6 @@ button:hover {
   background: #019875;
 }
 
-audio {
-  display: block;
-  margin: 40px auto 0;
-  width: 100%;
-  max-width: 600px;
-}
-
 a {
   display: block;
   text-align: center;
@@ -123,9 +116,7 @@ a {
     <button onclick="sendMessage()">Send</button>
   </div><a href="homepage.html">← Back to Homepage</a>
 
-  <audio autoplay loop controls>
-    <source src="music/track.mp3" type="audio/mpeg" />
-  </audio>  <!-- Firebase Logic -->  <script type="module">
+  <!-- Firebase Logic -->  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, push, onChildAdded, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -166,7 +157,7 @@ a {
       const p = document.createElement("div");
       p.className = "msg";
       p.id = data.key;
-      const time = new Date(chat.timestamp).toLocaleTimeString();
+      const time = new Date(chat.timestamp).toLocaleString();
 
       p.innerHTML = `
         <strong>${chat.username}:</strong> 
