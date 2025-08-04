@@ -5,113 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Welcome | Davinto Tech Hub</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
+      margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white;
+      background: linear-gradient(to right, #1e3c72, #2a5298);
+      color: #fff;
       text-align: center;
-      padding: 60px 20px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    body.dark {
-      background: #fff;
-      color: #222;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
     }
 
     .logo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 3px solid #00b894;
       margin-bottom: 20px;
     }
 
     h1 {
-      font-size: 2.8em;
-      margin-bottom: 15px;
+      font-size: 2.5em;
+      margin-bottom: 10px;
     }
 
     p {
       font-size: 1.2em;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .btn {
-      padding: 12px 25px;
+      display: inline-block;
       margin: 10px;
+      padding: 12px 24px;
+      background: #00cec9;
+      color: #000;
       border: none;
-      background: #00b894;
-      color: white;
-      border-radius: 8px;
+      border-radius: 25px;
       font-size: 1em;
+      font-weight: bold;
       cursor: pointer;
+      text-decoration: none;
       transition: background 0.3s;
     }
 
     .btn:hover {
-      background: #019875;
-    }
-
-    .toggle-mode {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid #aaa;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      color: white;
-    }
-
-    body.dark .toggle-mode {
-      background: rgba(0, 0, 0, 0.1);
-      color: black;
-      border-color: #333;
+      background: #00b894;
+      color: #fff;
     }
 
     audio {
-      margin-top: 40px;
-      width: 100%;
-      max-width: 600px;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
-
-  <div class="container">
-    <img src="logo.png" alt="Davinto Tech Hub Logo" class="logo" />
-
-    <h1>Welcome to Davinto Tech Hub</h1>
-    <p>A place to showcase tech skills, connect with enthusiasts, and empower future innovators.</p>
-
-    <button class="btn" onclick="location.href='signup.html'">Sign Up</button>
-    <button class="btn" onclick="location.href='login.html'">Login</button>
-
-    <audio autoplay loop controls>
-      <source src="music/track.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
+  <div class="logo">
+    <img src="logo.png" alt="Davinto Tech Hub" height="80" />
   </div>
 
-  <script>
-    function toggleMode() {
-      document.body.classList.toggle('dark');
-      const toggle = document.querySelector('.toggle-mode');
-      toggle.textContent = document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
-    }
-  </script>
+  <h1>Welcome to Davinto Tech Hub</h1>
+  <p>Empowering future minds through tech. Join us today!</p>
+
+  <a href="login.html" class="btn">Login</a>
+  <a href="signup.html" class="btn">Sign Up</a>
+
+  <!-- Background music -->
+  <audio autoplay loop>
+    <source src="music/track.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
 
 </body>
 </html>
