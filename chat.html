@@ -1,210 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Global Chat | Davinto Tech Hub</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #1e272e;
-      color: white;
-      padding: 20px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    body.dark {
-      background: #ffffff;
-      color: #111;
-    }
-
-    .toggle-mode {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      cursor: pointer;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid #aaa;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      color: white;
-    }
-
-    body.dark .toggle-mode {
-      background: rgba(0, 0, 0, 0.1);
-      color: black;
-      border-color: #333;
-    }
-
-    .chat-box {
-      max-width: 800px;
-      margin: 70px auto 30px;
-      background: rgba(255,255,255,0.05);
-      padding: 20px;
-      border-radius: 10px;
-      height: 400px;
-      overflow-y: auto;
-    }
-
-    .msg {
-      margin-bottom: 15px;
-      line-height: 1.5;
-    }
-
-    .msg strong {
-      color: #00cec9;
-    }
-
-    .timestamp {
-      font-size: 12px;
-      color: #ccc;
-      margin-left: 5px;
-    }
-
-    .input-area {
-      max-width: 800px;
-      margin: auto;
-      display: flex;
-      gap: 10px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 12px 18px;
-      background: #00b894;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #019875;
-    }
-
-    iframe {
-      display: block;
-      margin: 40px auto 0;
-      width: 100%;
-      max-width: 560px;
-      height: 315px;
-      border: none;
-    }
-
-    a {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #00cec9;
-    }
+    body, html { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background:#1e272e; color:#fff; }
+    body.dark { background:#fff; color:#111; }
+    .toggle { position:fixed; top:10px; right:10px; background:rgba(255,255,255,0.1); padding:6px 12px; border-radius:20px; cursor:pointer; }
+    .chat { max-width:800px; margin:80px auto 0; padding:10px; height:400px; overflow-y:auto; background:rgba(0,0,0,0.2); border-radius:8px; }
+    .msg { padding:8px; margin:6px 0; background:rgba(255,255,255,0.1); border-radius:6px; }
+    .msg.dark { background:rgba(0,0,0,0.1); color:#111; }
+    .msg strong { color:#00cec9; }
+    .time { font-size:0.8em; color:#ccc; }
+    input { width:calc(100% - 90px); padding:10px; border-radius:4px; border:none; }
+    button { padding:10px 15px; margin-left:5px; background:#00b894; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#019875; }
+    .controls { font-size:0.8em; margin-left:10px; color:#0af; cursor:pointer; }
+    iframe { position:fixed; bottom:0; left:0; width:100%; height:80px; border:none; pointer-events:none; opacity:0.8; }
+    a.back { text-align:center; display:block; margin:10px 0; color:#00cec9; }
   </style>
 </head>
 <body>
 
-  <div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
+  <div class="toggle" onclick="toggleMode()">🌙 Dark Mode</div>
 
-  <div class="chat-box" id="chat-box">
-    <p>Loading chat...</p>
+  <div class="chat" id="chat"></div>
+  <div style="max-width:800px;margin:20px auto;display:flex;">
+    <input type="text" id="msgInput" placeholder="Type your message..." />
+    <button onclick="sendMsg()">Send</button>
   </div>
+  <a href="homepage.html" class="back">← Back to Homepage</a>
 
-  <div class="input-area">
-    <input type="text" id="messageInput" placeholder="Type your message..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+  <!-- YouTube embed royalty‑free tech music -->
+  <iframe src="https://www.youtube.com/embed/9luV-s_Dk1w?autoplay=1&loop=1&playlist=9luV-s_Dk1w&mute=1" allow="autoplay"></iframe>
 
-  <a href="homepage.html">← Back to Homepage</a>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getDatabase, ref, push, onChildAdded, update, remove, get, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-  <!-- YouTube Music Embed -->
-  <iframe 
-    src="https://www.youtube.com/embed/Z5o_k5e85Tw?autoplay=1&mute=0&loop=1&playlist=Z5o_k5e85Tw"
-    allow="autoplay; encrypted-media"
-    allowfullscreen>
-  </iframe>
+const firebaseConfig = { apiKey:"...", authDomain:"...", projectId:"...", databaseURL:"https://davinto-tech-hub-default-rtdb.firebaseio.com/" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-  <!-- Firebase Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+let currentUser = null, currentUsername = '';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKLhrbWwTKa9TXY5h0oLhiINnWhLkvQTQ",
-      authDomain: "davinto-tech-hub.firebaseapp.com",
-      projectId: "davinto-tech-hub",
-      storageBucket: "davinto-tech-hub.appspot.com",
-      messagingSenderId: "682350610303",
-      appId: "1:682350610303:web:ce91a8e11033312f57fc4a",
-      databaseURL: "https://davinto-tech-hub-default-rtdb.firebaseio.com/"
-    };
+onAuthStateChanged(auth, async user => {
+  if (!user) location.href = 'login.html';
+  else {
+    currentUser = user.uid;
+    const snap = await get(child(ref(db), `users/${currentUser}`));
+    currentUsername = snap.val()?.username || 'Unknown';
+  }
+});
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+const chatEl = document.getElementById('chat');
+onChildAdded(ref(db, 'globalChat'), snapshot => {
+  const data = snapshot.val();
+  const isOwn = data.uid === currentUser;
+  const p = document.createElement('div');
+  p.className = 'msg' + (document.body.classList.contains('dark')?' dark':'');
+  p.id = snapshot.key;
+  const timeStr = new Date(data.timestamp).toLocaleString();
+  p.innerHTML = `<strong>${data.username}:</strong> ${data.text} <span class="time">${timeStr}</span>`;
+  if (isOwn) p.innerHTML += `<span class="controls" onclick="editMsg('${snapshot.key}')">Edit</span><span class="controls" onclick="deleteMsg('${snapshot.key}')">Delete</span>`;
+  chatEl.appendChild(p);
+  chatEl.scrollTop = chatEl.scrollHeight;
+});
 
-    let username = "Guest";
+window.sendMsg = () => {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+  push(ref(db, 'globalChat'), { uid:currentUser, username:currentUsername, text, timestamp:Date.now() });
+  input.value = '';
+};
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+window.editMsg = async key => {
+  const node = document.getElementById(key);
+  const newText = prompt('Edit your message:', node.innerText.split(': ')[1].split(' ')[0]);
+  if (newText !== null) {
+    await update(child(ref(db, 'globalChat'), key), { text:newText });
+  }
+};
 
-      const uid = user.uid;
-      const snap = await get(ref(db, `users/${uid}`));
-      if (snap.exists()) {
-        username = snap.val().username || "Unknown";
-      }
-    });
+window.deleteMsg = async key => {
+  if (confirm('Delete this message?')) {
+    await remove(child(ref(db, 'globalChat'), key));
+    document.getElementById(key).remove();
+  }
+};
 
-    const chatBox = document.getElementById("chat-box");
-
-    onChildAdded(ref(db, "globalChat"), data => {
-      const chat = data.val();
-      const p = document.createElement("p");
-      p.className = "msg";
-
-      const time = new Date(chat.timestamp || Date.now());
-      const hours = time.getHours();
-      const minutes = String(time.getMinutes()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const timeStr = `${(hours % 12 || 12)}:${minutes} ${ampm}`;
-
-      p.innerHTML = `<strong>${chat.username}:</strong> ${chat.text} <span class="timestamp">${timeStr}</span>`;
-      chatBox.appendChild(p);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    });
-
-    window.sendMessage = function () {
-      const input = document.getElementById("messageInput");
-      const text = input.value.trim();
-      if (!text) return;
-
-      push(ref(db, "globalChat"), {
-        username,
-        text,
-        timestamp: Date.now()
-      });
-
-      input.value = "";
-    };
-
-    window.toggleMode = function () {
-      document.body.classList.toggle("dark");
-      document.querySelector(".toggle-mode").textContent =
-        document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
-    };
-  </script>
+window.toggleMode = () => {
+  document.body.classList.toggle('dark');
+  document.querySelector('.toggle').textContent =
+    document.body.classList.contains('dark') ? "☀️ Light Mode" : "🌙 Dark Mode";
+};
+</script>
 
 </body>
 </html>
