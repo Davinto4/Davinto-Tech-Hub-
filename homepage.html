@@ -35,6 +35,14 @@ nav a:hover {
   text-decoration: underline;
 }
 
+.announcement {
+  background: #fdcb6e;
+  color: #000;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
 .hero {
   text-align: center;
   padding: 60px 20px;
@@ -66,6 +74,41 @@ nav a:hover {
   line-height: 1.6;
 }
 
+.events ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.events li {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 15px;
+  margin: 10px 0;
+  border-left: 5px solid #00cec9;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.contacts a {
+  text-decoration: none;
+  background: #00cec9;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.contacts a:hover {
+  background: #00b894;
+  color: #fff;
+}
+
 .footer {
   text-align: center;
   padding: 20px;
@@ -76,7 +119,9 @@ nav a:hover {
 
   </style>
 </head>
-<body>  <header>
+<body>  <div class="announcement">
+    🚨 Next Live Tech Class: Tonight at 9PM – <strong>Fundamentals of Computer</strong>. Join the Global Chat to participate!
+  </div>  <header>
     <img src="logo.png" alt="Davinto Tech Hub" height="60" style="vertical-align: middle;">
     <span>Davinto Tech Hub</span>
   </header>  <nav>
@@ -89,6 +134,16 @@ nav a:hover {
   </div>  <div class="section">
     <h2>About This Hub</h2>
     <p>Davinto Tech Hub is an open platform created to showcase my tech skills and help others learn in a fun, interactive way. Whether you're a total beginner or already passionate about tech, this is your space to grow.</p>
+  </div>  <div class="section events">
+    <h2>📅 Upcoming Event</h2>
+    <ul>
+      <li><strong>Fundamentals of Computer</strong> – Tonight @ 9PM (Join via Global Chat)</li>
+    </ul>
+  </div>  <div class="section contacts">
+    <h2>📞 Contact Me</h2>
+    <a href="https://wa.me/2348169045105" target="_blank">📱 WhatsApp: +2348169045105</a>
+    <a href="https://t.me/2348169045105" target="_blank">📲 Telegram: +2348169045105</a>
+    <a href="mailto:davintotech@gmail.com">📧 Email: davintotech@gmail.com</a>
   </div>  <div class="footer">
     &copy; 2025 Davinto Tech Hub. All rights reserved.
   </div></body>
