@@ -51,11 +51,17 @@
 
     .msg {
       margin-bottom: 15px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .msg strong {
       color: #00cec9;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: #ccc;
+      margin-left: 5px;
     }
 
     .input-area {
@@ -87,11 +93,13 @@
       background: #019875;
     }
 
-    audio {
+    iframe {
       display: block;
       margin: 40px auto 0;
       width: 100%;
-      max-width: 600px;
+      max-width: 560px;
+      height: 315px;
+      border: none;
     }
 
     a {
@@ -117,9 +125,12 @@
 
   <a href="homepage.html">← Back to Homepage</a>
 
-  <audio autoplay loop controls>
-    <source src="music/track.mp3" type="audio/mpeg" />
-  </audio>
+  <!-- YouTube Music Embed -->
+  <iframe 
+    src="https://www.youtube.com/embed/Z5o_k5e85Tw?autoplay=1&mute=0&loop=1&playlist=Z5o_k5e85Tw"
+    allow="autoplay; encrypted-media"
+    allowfullscreen>
+  </iframe>
 
   <!-- Firebase Logic -->
   <script type="module">
@@ -162,7 +173,14 @@
       const chat = data.val();
       const p = document.createElement("p");
       p.className = "msg";
-      p.innerHTML = `<strong>${chat.username}:</strong> ${chat.text}`;
+
+      const time = new Date(chat.timestamp || Date.now());
+      const hours = time.getHours();
+      const minutes = String(time.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const timeStr = `${(hours % 12 || 12)}:${minutes} ${ampm}`;
+
+      p.innerHTML = `<strong>${chat.username}:</strong> ${chat.text} <span class="timestamp">${timeStr}</span>`;
       chatBox.appendChild(p);
       chatBox.scrollTop = chatBox.scrollHeight;
     });
